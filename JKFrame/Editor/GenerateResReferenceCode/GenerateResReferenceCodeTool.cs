@@ -78,33 +78,36 @@ namespace R
             {
                 AddressableAssetEntry assetItem = allAssetEntry[i];
                 // 添加到类型列表中等待添加命名空间
+                // string assemblyNam = assetItem.MainAssetType.Assembly.GetName().Name;
                 string assemblyNam = assetItem.MainAssetType.Assembly.GetName().Name;
-                if (assemblyNam != "UnityEngine.CoreModule" && !allTypeAssemblyNames.Contains(assemblyNam))
+                if (assemblyNam != "UnityEngine.CoreModule" && assemblyNam != "Assembly-CSharp" && !allTypeAssemblyNames.Contains(assemblyNam))
                 {
                     allTypeAssemblyNames.Add(assemblyNam);
                 }
 
-                if (assetItem.IsSubAsset)   // sub资源主要存在[]无法生成class
-                {
-                    string subAssetPropertyStr = SubAssetPropertyTemplate.Replace("##类型##", assetItem.MainAssetType.Name);
-                    string assetName = assetItem.address.Replace("[", "_").Replace("]", ""); // 去除子资源中的括号
-                    subAssetPropertyStr = subAssetPropertyStr.Replace("##资源名称##", assetName.Replace(" ", ""));
-                    subAssetPropertyStr = subAssetPropertyStr.Replace("##资源路径##", assetItem.address);
-                    propertyStrs += subAssetPropertyStr;
-                }
-                else
-                {
-                    string propertyStr = PropertyTemplate.Replace("##类型##", assetItem.MainAssetType.Name);
-                    propertyStr = propertyStr.Replace("##资源名称##", assetItem.address.Replace(" ", ""));
+                // if (assetItem.IsSubAsset)   // sub资源主要存在[]无法生成class
+                // {
+                //     // string subAssetPropertyStr = SubAssetPropertyTemplate.Replace("##类型##", assetItem.MainAssetType.Name);
+                //     string subAssetPropertyStr = SubAssetPropertyTemplate.Replace("##类型##", assetItem.MainAssetType.FullName);
+                //     string assetName = assetItem.address.Replace("[", "_").Replace("]", ""); // 去除子资源中的括号
+                //     subAssetPropertyStr = subAssetPropertyStr.Replace("##资源名称##", assetName.Replace(" ", ""));
+                //     subAssetPropertyStr = subAssetPropertyStr.Replace("##资源路径##", assetItem.address);
+                //     propertyStrs += subAssetPropertyStr;
+                // }
+                // else
+                // {
+                    string propertyStr = PropertyTemplate.Replace("##类型##", assetItem.MainAssetType.FullName);
+                    
+                    propertyStr = propertyStr.Replace("##资源名称##", GetAssetNameSimpleClean(assetItem));
                     propertyStr = propertyStr.Replace("##资源路径##", assetItem.address);
                     propertyStrs += propertyStr;
                     if (assetItem.MainAssetType == typeof(GameObject))  // 游戏物体增加一个用于直接实例化的
                     {
-                        string gameObjectPropertyStr = GameObjectPropertyTemplate.Replace("##资源名称##", assetItem.address.Replace(" ", ""));
+                        string gameObjectPropertyStr = GameObjectPropertyTemplate.Replace("##资源名称##", GetAssetNameSimpleClean(assetItem));
                         gameObjectPropertyStr = gameObjectPropertyStr.Replace("##资源路径##", assetItem.address);
                         propertyStrs += gameObjectPropertyStr;
                     }
-                }
+                // }
             }
             groupStr = groupStr.Replace("~~成员~~", propertyStrs);
             groupsStr += groupStr;
@@ -130,6 +133,24 @@ namespace R
         AssetDatabase.Refresh();
         // 结束生成
         JKLog.Succeed("生成资源代码成功");
+    }
+
+    private static string GetAssetNameSimpleClean(AddressableAssetEntry assetItem)
+    {
+        //去除斜杠、空格、后缀、方括号
+        string assetName = assetItem.address.Replace("/", "_").Replace(" ", "");
+        assetName = assetName.Replace("[", "_").Replace("]", "");
+        
+        //后来发现不能去掉后缀，因为图片在生成默认AddressName的时候，中间会有“.”符号
+        // 如果去掉后缀的话，会造成“.”符号后的一大串信息丢失
+        // if (assetName.Contains("."))
+        // {
+        //     assetName = assetName.Split(".")[0];
+        // }
+
+        assetName = assetName.Replace(".", "_").Replace("-", "_");
+
+        return assetName;
     }
 }
 #endif
