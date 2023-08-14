@@ -482,5 +482,27 @@ namespace JKFrame
             RemoveEventListener(com, JKEventType.OnDestroy, action);
         }
         #endregion
+
+        #region 生命周期
+
+        public static void OnEnable<TEventArg>(this Component com, Action<GameObject, TEventArg> action, TEventArg args = default(TEventArg))
+        {
+            AddEventListener(com, JKEventType.OnEnable, action, args);
+        }
+        public static void RemoveOnEnable<TEventArg>(this Component com, Action<GameObject, TEventArg> action)
+        {
+            RemoveEventListener(com, JKEventType.OnEnable, action);
+        }
+        
+        public static void OnDisable<TEventArg>(this Component com, Action<GameObject, TEventArg> action, TEventArg args = default(TEventArg))
+        {
+            AddEventListener(com, JKEventType.OnDisable, action, args);
+        }
+        public static void RemoveOnDisable<TEventArg>(this Component com, Action<GameObject, TEventArg> action)
+        {
+            RemoveEventListener(com, JKEventType.OnDisable, action);
+        }
+
+        #endregion
     }
 }

@@ -31,6 +31,8 @@ namespace JKFrame
         OnTriggerExit2D = -10020,
         OnReleaseAddressableAsset = -10021,
         OnDestroy = -10022,
+        OnEnable = -10023,
+        OnDisable = -10024,
     }
 
     public interface IMouseEvent : IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
@@ -486,6 +488,20 @@ namespace JKFrame
             // 销毁所有数据，并将一些数据放回对象池中
             RemoveAllListener();
         }
+        #endregion
+
+        #region 生命周期
+
+        private void OnEnable()
+        {
+            TriggerAction(JKEventType.OnEnable, gameObject);
+        }
+
+        private void OnDisable()
+        {
+            TriggerAction(JKEventType.OnDisable, gameObject);
+        }
+
         #endregion
     }
 }
