@@ -151,6 +151,7 @@ namespace JKFrame
             {
                 for (int i = 0; i < coroutineList.Count; i++)
                 {
+                    if (coroutineList[i] == null) continue;
                     instance.StopCoroutine(coroutineList[i]);
                 }
                 coroutineList.Clear();
