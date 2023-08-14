@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Sirenix.Utilities;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
 namespace JKFrame
 {
     /// <summary>
@@ -29,10 +29,10 @@ namespace JKFrame
                 count += 1;
                 Update();
             }
-            public void OnWindowClose(bool update = true)
+            public void OnWindowClose()
             {
                 count -= 1;
-                if (update) Update();
+                Update();
             }
             private void Update()
             {
@@ -245,19 +245,19 @@ namespace JKFrame
                 // 原本就激活使用状态，避免内部计数问题，进行一次层关闭
                 if (windowData.instance.UIEnable)
                 {
-                    UILayers[layerNum].OnWindowClose(false);
+                    UILayers[windowData.layerNum].OnWindowClose();
                 }
                 windowData.instance.gameObject.SetActive(true);
                 windowData.instance.transform.SetParent(UILayers[layerNum].root);
                 windowData.instance.transform.SetAsLastSibling();
-                windowData.instance.ShowGeneralLogic();
+                windowData.instance.ShowGeneralLogic(layerNum);
             }
             else
             {
                 UI_WindowBase window = ResSystem.InstantiateGameObject<UI_WindowBase>(windowData.assetPath, UILayers[layerNum].root, windowKey);
                 windowData.instance = window;
                 window.Init();
-                window.ShowGeneralLogic();
+                window.ShowGeneralLogic(layerNum);
             }
             windowData.layerNum = layerNum;
             UILayers[layerNum].OnWindowShow();
@@ -326,7 +326,7 @@ namespace JKFrame
         public static bool TryGetWindow(string windowKey, out UI_WindowBase window)
         {
             UIWindowDataDic.TryGetValue(windowKey, out UIWindowData windowData);
-            window = windowData.instance;
+            window = windowData?.instance;
             return window != null;
         }
 
@@ -337,7 +337,7 @@ namespace JKFrame
         public static bool TryGetWindow<T>(string windowKey, out T window) where T : UI_WindowBase
         {
             UIWindowDataDic.TryGetValue(windowKey, out UIWindowData windowData);
-            window = windowData.instance as T;
+            window = windowData?.instance as T;
             return window != null;
         }
 
@@ -425,13 +425,11 @@ namespace JKFrame
         public static void CloseAllWindow()
         {
             // 处理缓存中所有状态的逻辑
-            var enumerator = UIWindowDataDic.GetEnumerator();
-            while (enumerator.MoveNext())
+            foreach (var item in UIWindowDataDic.Values)
             {
-                if (enumerator.Current.Value.instance != null
-                    && enumerator.Current.Value.instance.gameObject.activeInHierarchy == true)
+                if (item.instance != null && item.instance.gameObject.activeInHierarchy == true)
                 {
-                    CloseWindow(enumerator.Current.Value);
+                    CloseWindow(item);
                 }
             }
             for (int i = 0; i < UILayers.Length; i++)
@@ -458,16 +456,26 @@ namespace JKFrame
         /// </summary>
         public static bool CheckMouseOnUI()
         {
-            return CheckPositoinOnUI(Input.mousePosition);
+#if ENABLE_LEGACY_INPUT_MANAGER
+            return CheckPositionOnUI(Input.mousePosition);
+#else
+            return CheckPositoinOnUI(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
+#endif
+
         }
 
+        private static UnityEngine.EventSystems.EventSystem eventSystem;
+        private static PointerEventData pointerEventData;
         /// <summary>
         /// 检查一个坐标是否在UI上,会屏蔽名称为Mask的物体
         /// </summary>
-        public static bool CheckPositoinOnUI(Vector2 pos)
+        public static bool CheckPositionOnUI(Vector2 pos)
         {
-            UnityEngine.EventSystems.EventSystem eventSystem = UnityEngine.EventSystems.EventSystem.current;
-            PointerEventData pointerEventData = new PointerEventData(eventSystem);
+            if (eventSystem == null)
+            {
+                eventSystem = UnityEngine.EventSystems.EventSystem.current;
+                pointerEventData = new PointerEventData(eventSystem);
+            }
             pointerEventData.position = pos;
             // 射线去检测有没有除了Mask以外的任何UI物体
             eventSystem.RaycastAll(pointerEventData, raycastResultList);

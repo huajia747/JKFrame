@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Sirenix.OdinInspector;
+using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace JKFrame
 {
@@ -16,17 +18,26 @@ namespace JKFrame
         // 窗口类型
         public Type Type { get { return this.GetType(); } }
 
+        public bool EnableLocalization => localizationConfig == null;
+
         /// <summary>
         /// 初始化
         /// </summary>
         public virtual void Init() { }
 
-        public void ShowGeneralLogic()
+        public void ShowGeneralLogic(int layerNum)
         {
-            uiEnable = true;
-            OnUpdateLanguage();
-            RegisterEventListener();
+            this.currentLayer = layerNum;
+            if (!uiEnable)
+            {
+                RegisterEventListener();
+                // 绑定本地化事件
+                LocalizationSystem.RegisterLanguageEvent(UpdateLanguageGeneralLogic);
+            }
+
             OnShow();
+            OnUpdateLanguage(LocalizationSystem.LanguageType);
+            uiEnable = true;
         }
 
         /// <summary>
@@ -34,11 +45,14 @@ namespace JKFrame
         /// </summary>
         public virtual void OnShow() { }
 
-
+        /// <summary>
+        /// 关闭的基本逻辑
+        /// </summary>
         public void CloseGeneralLogic()
         {
             uiEnable = false;
-            CancelEventListener();
+            UnRegisterEventListener();
+            LocalizationSystem.UnregisterLanguageEvent(UpdateLanguageGeneralLogic);
             OnClose();
         }
 
@@ -55,7 +69,27 @@ namespace JKFrame
         /// <summary>
         /// 取消事件
         /// </summary>
-        protected virtual void CancelEventListener() { }
-        protected virtual void OnUpdateLanguage() { }
+        protected virtual void UnRegisterEventListener() { }
+
+        #region 本地化
+        /// <summary>
+        /// 当本地化配置中不包含指定key时，会自动在全局配置中尝试
+        /// </summary>
+        [SerializeField, LabelText("本地化配置")]
+        public LocalizationConfig localizationConfig;
+
+        protected void UpdateLanguageGeneralLogic(LanguageType languageType)
+        {
+            OnUpdateLanguage(languageType);
+        }
+
+        /// <summary>
+        /// 当语言更新时
+        /// </summary>
+        protected virtual void OnUpdateLanguage(LanguageType languageType)
+        {
+
+        }
+        #endregion
     }
 }
