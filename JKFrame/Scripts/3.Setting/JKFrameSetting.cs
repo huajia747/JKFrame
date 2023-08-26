@@ -5,6 +5,7 @@ using System;
 using System.Reflection;
 using System.Collections;
 using Sirenix.Serialization;
+using UnityEditor.Build;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -150,10 +151,10 @@ namespace JKFrame
         public static void AddScriptCompilationSymbol(string name)
         {
             BuildTargetGroup buildTargetGroup = UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup;
-            string group = UnityEditor.PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
+            string group = UnityEditor.PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup));
             if (!group.Contains(name))
             {
-                UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, group + ";" + name);
+                UnityEditor.PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup), group + ";" + name);
             }
         }
 
@@ -163,10 +164,10 @@ namespace JKFrame
         public static void RemoveScriptCompilationSymbol(string name)
         {
             BuildTargetGroup buildTargetGroup = UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup;
-            string group = UnityEditor.PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
+            string group = UnityEditor.PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup));
             if (group.Contains(name))
             {
-                UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, group.Replace(";" + name, string.Empty));
+                UnityEditor.PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup), group.Replace(";" + name, string.Empty));
             }
         }
 
