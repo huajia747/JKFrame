@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace JKFrame
@@ -9,9 +8,17 @@ namespace JKFrame
     /// </summary>
     public static class CoroutineTool
     {
+        private struct WaitForFrameStruct : IEnumerator
+        {
+            public object Current => null;
+
+            public bool MoveNext() { return false; }
+
+            public void Reset() { }
+        }
+
         private static WaitForEndOfFrame waitForEndOfFrame = new WaitForEndOfFrame();
         private static WaitForFixedUpdate waitForFixedUpdate = new WaitForFixedUpdate();
-        private static YieldInstruction yieldInstruction = new YieldInstruction();
         public static WaitForEndOfFrame WaitForEndOfFrame()
         {
             return waitForEndOfFrame;
@@ -26,7 +33,7 @@ namespace JKFrame
             while (currTime < time)
             {
                 currTime += Time.deltaTime;
-                yield return yieldInstruction;
+                yield return new WaitForFrameStruct();
             }
         }
 
@@ -36,18 +43,20 @@ namespace JKFrame
             while (currTime < time)
             {
                 currTime += Time.unscaledDeltaTime;
-                yield return yieldInstruction;
+                yield return new WaitForFrameStruct();
             }
         }
 
+        public static IEnumerator WaitForFrame()
+        {
+            yield return new WaitForFrameStruct();
+        }
         public static IEnumerator WaitForFrames(int count = 1)
         {
             for (int i = 0; i < count; i++)
             {
-                yield return yieldInstruction;
+                yield return new WaitForFrameStruct();
             }
         }
-
     }
-
 }
