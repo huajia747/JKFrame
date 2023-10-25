@@ -349,12 +349,19 @@ namespace JKFrame
         /// <typeparam name="T">资源类型</typeparam>
         /// <param name="assetName">AB资源名称</param>
         /// <param name="callBack">回调函数</param>
-        public static void LoadAssetAsync<T>(string assetName, Action<T> callback) where T : UnityEngine.Object
+        public static AsyncOperationHandle<T> LoadAssetAsync<T>(string assetName, Action<T> callback) where T : UnityEngine.Object
         {
-            Addressables.LoadAssetAsync<T>(assetName).Completed += (handle) =>
+            var asyncOperationHandle = Addressables.LoadAssetAsync<T>(assetName);
+            asyncOperationHandle.Completed += (handle) =>
             {
                 OnLoadAssetAsyncCompleted<T>(handle, callback);
             };
+            return asyncOperationHandle;
+            
+            // Addressables.LoadAssetAsync<T>(assetName).Completed += (handle) =>
+            // {
+            //     OnLoadAssetAsyncCompleted<T>(handle, callback);
+            // };
         }
 
         private static void OnLoadAssetAsyncCompleted<T>(AsyncOperationHandle<T> handle, Action<T> callback) where T : UnityEngine.Object
