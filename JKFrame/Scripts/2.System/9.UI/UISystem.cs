@@ -220,17 +220,6 @@ namespace JKFrame
         }
 
         /// <summary>
-        /// 显示窗口 异步
-        /// </summary>
-        /// <typeparam name="T">要返回的窗口类型</typeparam>
-        /// <param name="windowKey">窗口的Key</param>
-        /// <param name="layer">层级 -1等于不设置</param>
-        public static T ShowAsync<T>(string windowKey, Action<T> callback = null, int layer = -1) where T : UI_WindowBase
-        {
-            return ShowAsync(windowKey, callback, layer) as T;
-        }
-
-        /// <summary>
         /// 显示窗口
         /// </summary>
         /// <param name="type">窗口类型</param>
@@ -324,6 +313,7 @@ namespace JKFrame
                 windowData.instance.transform.SetParent(UILayers[layerNum].root);
                 windowData.instance.transform.SetAsLastSibling();
                 windowData.instance.ShowGeneralLogic(layerNum);
+                callback?.Invoke(windowData.instance);
             }
             else
             {
@@ -520,12 +510,7 @@ namespace JKFrame
         public static void AddTips(string tips)
         {
             UITipsItem item = PoolSystem.GetGameObject<UITipsItem>(instance.UITipsItemPrefab.name, instance.UITipsItemParent);
-            
-            if (item == null) {
-                item = GameObject.Instantiate(instance.UITipsItemPrefab, instance.UITipsItemParent).GetComponent<UITipsItem>();
-                  item.name = instance.UITipsItemPrefab.name;
-            }
-
+            if (item == null) item = GameObject.Instantiate(instance.UITipsItemPrefab, instance.UITipsItemParent).GetComponent<UITipsItem>();
             item.Init(tips);
         }
         #endregion

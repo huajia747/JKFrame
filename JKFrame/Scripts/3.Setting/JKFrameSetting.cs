@@ -3,9 +3,6 @@ using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using System;
 using System.Reflection;
-using System.Collections;
-using Sirenix.Serialization;
-using UnityEditor.Build;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -45,6 +42,9 @@ namespace JKFrame
         [LabelText("存档方式"), Tooltip("修改类型会导致之前的存档丢失"), OnValueChanged(nameof(SetSaveSystemType))]
 #endif
         public SaveSystemType SaveSystemType = SaveSystemType.Binary;
+
+        [LabelText("二进制序列化器，仅用于二进制方式存档")]
+        public IBinarySerializer binarySerializer;
 
         [LabelText("日志设置")] public LogSetting LogConfig = new LogSetting();
 
@@ -151,10 +151,10 @@ namespace JKFrame
         public static void AddScriptCompilationSymbol(string name)
         {
             BuildTargetGroup buildTargetGroup = UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup;
-            string group = UnityEditor.PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup));
+            string group = UnityEditor.PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
             if (!group.Contains(name))
             {
-                UnityEditor.PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup), group + ";" + name);
+                UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, group + ";" + name);
             }
         }
 
@@ -164,10 +164,10 @@ namespace JKFrame
         public static void RemoveScriptCompilationSymbol(string name)
         {
             BuildTargetGroup buildTargetGroup = UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup;
-            string group = UnityEditor.PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup));
+            string group = UnityEditor.PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
             if (group.Contains(name))
             {
-                UnityEditor.PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup), group.Replace(";" + name, string.Empty));
+                UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, group.Replace(";" + name, string.Empty));
             }
         }
 
@@ -180,21 +180,29 @@ namespace JKFrame
             // 遍历程序集
             foreach (System.Reflection.Assembly assembly in asms)
             {
-                // 遍历程序集下的每一个类型
-                Type[] types = assembly.GetTypes();
-                foreach (Type type in types)
-                {
-                    if (baseType.IsAssignableFrom(type)
-                        && !type.IsAbstract)
-                    {
-                        var attributes = type.GetCustomAttributes<UIWindowDataAttribute>();
-                        foreach (var attribute in attributes)
-                        {
-                            UIWindowDataDic.Add(attribute.windowKey,
-                                new UIWindowData(attribute.isCache, attribute.assetPath, attribute.layerNum));
-                        }
 
+                // 遍历程序集下的每一个类型
+                try
+                {
+                    Type[] types = assembly.GetTypes();
+                    foreach (Type type in types)
+                    {
+                        if (baseType.IsAssignableFrom(type)
+                            && !type.IsAbstract)
+                        {
+                            var attributes = type.GetCustomAttributes<UIWindowDataAttribute>();
+                            foreach (var attribute in attributes)
+                            {
+                                UIWindowDataDic.Add(attribute.windowKey,
+                                    new UIWindowData(attribute.isCache, attribute.assetPath, attribute.layerNum));
+                            }
+
+                        }
                     }
+                }
+                catch (Exception)
+                {
+                    continue;
                 }
             }
         }
