@@ -1,3 +1,4 @@
+using System.Text;
 using UnityEngine;
 
 namespace JKFrame.MyTool
@@ -15,14 +16,27 @@ namespace JKFrame.MyTool
         //     }
         //     return go;
         // }
-
-        public static GameObject GetGameObject(GameObject gameObjectPrefab, Vector3 inPosition, Quaternion inRotation)
+        private static readonly StringBuilder StringBuilder = new StringBuilder();
+        public static GameObject GetGameObject(GameObject gameObjectPrefab, Vector3 inPosition, Quaternion inRotation, string idPrefix = "")
         {
-            var go = PoolSystem.GetGameObject(gameObjectPrefab.name);
+            string goName;
+            
+            if (string.IsNullOrEmpty(idPrefix))
+            {
+                goName = gameObjectPrefab.name;
+            }
+            else
+            {
+                StringBuilder.Clear();
+                StringBuilder.AppendFormat("{0}_{1}", idPrefix, gameObjectPrefab.name);
+                goName = StringBuilder.ToString();
+            }
+            
+            var go = PoolSystem.GetGameObject(goName);
             if (go == null)
             {
                 go = GameObject.Instantiate(gameObjectPrefab, inPosition, inRotation);
-                go.name = gameObjectPrefab.name;
+                go.name = goName;
             }
             else
             {
@@ -32,28 +46,41 @@ namespace JKFrame.MyTool
             return go;
         }
 
-        public static T GetGameObject<T>(GameObject gameObjectPrefab, Vector3 inPosition, Quaternion inRotation)
+        public static T GetGameObject<T>(GameObject gameObjectPrefab, Vector3 inPosition, Quaternion inRotation, string idPrefix = "")
             where T : Component
         {
-            var go = GetGameObject(gameObjectPrefab, inPosition, inRotation);
+            var go = GetGameObject(gameObjectPrefab, inPosition, inRotation, idPrefix);
             return go.GetComponent<T>();
         }
         
-        public static GameObject GetGameObject(GameObject gameObjectPrefab, Transform inParent)
+        public static GameObject GetGameObject(GameObject gameObjectPrefab, Transform inParent, string idPrefix = "")
         {
-            var go = PoolSystem.GetGameObject(gameObjectPrefab.name, inParent);
+            string goName;
+            
+            if (string.IsNullOrEmpty(idPrefix))
+            {
+                goName = gameObjectPrefab.name;
+            }
+            else
+            {
+                StringBuilder.Clear();
+                StringBuilder.AppendFormat("{0}_{1}", idPrefix, gameObjectPrefab.name);
+                goName = StringBuilder.ToString();
+            }
+            
+            var go = PoolSystem.GetGameObject(goName, inParent);
             if (go == null)
             {
                 go = GameObject.Instantiate(gameObjectPrefab, inParent);
-                go.name = gameObjectPrefab.name;
+                go.name = goName;
             }
 
             return go;
         }
 
-        public static T GetGameObject<T>(GameObject gameObjectPrefab, Transform inParent)
+        public static T GetGameObject<T>(GameObject gameObjectPrefab, Transform inParent, string idPrefix = "")
         {
-            var go = GetGameObject(gameObjectPrefab, inParent);
+            var go = GetGameObject(gameObjectPrefab, inParent, idPrefix);
             return go.GetComponent<T>();
         }
     }

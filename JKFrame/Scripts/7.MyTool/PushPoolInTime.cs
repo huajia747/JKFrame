@@ -19,6 +19,8 @@ namespace JKFrame.MyTool
                     lifetime = ParticleUtil.ParticleSystemLength(transform);
                     _timer = lifetime;
                 }
+
+                autoCalculate = false; // 只在第一次实例化出来的时候计算，之后从池中拿出来不需要再算了。
             }
         }
 
