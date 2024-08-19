@@ -17,11 +17,10 @@ namespace JKFrame.MyTool
                 {
                     //todo 每实例化一个Particle，都要算一遍，可以节省。考虑让所有的同类物体的delayLife共用一个。
                     lifetime = ParticleUtil.ParticleSystemLength(transform);
-                    _timer = lifetime;
                 }
-
                 autoCalculate = false; // 只在第一次实例化出来的时候计算，之后从池中拿出来不需要再算了。
             }
+            _timer = lifetime;
         }
 
         private void OnEnable()

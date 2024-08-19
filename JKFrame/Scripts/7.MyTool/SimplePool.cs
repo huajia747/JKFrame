@@ -17,21 +17,34 @@ namespace JKFrame.MyTool
         //     return go;
         // }
         private static readonly StringBuilder StringBuilder = new StringBuilder();
-        public static GameObject GetGameObject(GameObject gameObjectPrefab, Vector3 inPosition, Quaternion inRotation, string idPrefix = "")
+
+        /// <summary>
+        /// 根据物体的名字和传入的前缀，得到实例化后将作为Pool的key的名字。
+        /// 做成Public是因为，在其他系统里会用到。比如目前特效系统，要根据特效预制体判断是否场上有已经存在的特效。
+        /// </summary>
+        /// <param name="gameObjectPrefab">要计算名字的物体</param>
+        /// <param name="idPrefix">算Key时会加上的前缀</param>
+        /// <returns>Pool中使用的KeyName</returns>
+        public static string GetKeyName(GameObject gameObjectPrefab, string idPrefix = "")
         {
-            string goName;
-            
+            string keyName;
             if (string.IsNullOrEmpty(idPrefix))
             {
-                goName = gameObjectPrefab.name;
+                keyName = gameObjectPrefab.name;
             }
             else
             {
                 StringBuilder.Clear();
                 StringBuilder.AppendFormat("{0}_{1}", idPrefix, gameObjectPrefab.name);
-                goName = StringBuilder.ToString();
+                keyName = StringBuilder.ToString();
             }
-            
+
+            return keyName;
+        }
+        
+        public static GameObject GetGameObject(GameObject gameObjectPrefab, Vector3 inPosition, Quaternion inRotation, string idPrefix = "")
+        {
+            var goName = GetKeyName(gameObjectPrefab, idPrefix);
             var go = PoolSystem.GetGameObject(goName);
             if (go == null)
             {
@@ -55,19 +68,7 @@ namespace JKFrame.MyTool
         
         public static GameObject GetGameObject(GameObject gameObjectPrefab, Transform inParent, string idPrefix = "")
         {
-            string goName;
-            
-            if (string.IsNullOrEmpty(idPrefix))
-            {
-                goName = gameObjectPrefab.name;
-            }
-            else
-            {
-                StringBuilder.Clear();
-                StringBuilder.AppendFormat("{0}_{1}", idPrefix, gameObjectPrefab.name);
-                goName = StringBuilder.ToString();
-            }
-            
+            var goName = GetKeyName(gameObjectPrefab, idPrefix);
             var go = PoolSystem.GetGameObject(goName, inParent);
             if (go == null)
             {
