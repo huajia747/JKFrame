@@ -76,6 +76,9 @@ namespace JKFrame.MyTool
                 go.name = goName;
             }
 
+            go.transform.localPosition = Vector3.zero;
+            go.transform.localRotation = Quaternion.identity;
+
             return go;
         }
 
