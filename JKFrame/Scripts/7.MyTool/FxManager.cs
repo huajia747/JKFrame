@@ -54,15 +54,7 @@ public class FxManager : SingletonMono<FxManager>
     {
         // 先从所有记录的单例特效中，检测是否有同一个特效
         var fxKeyName = SimplePool.GetKeyName(fxPrefab, idPrefix);
-        if (_singletonFxRecord.ContainsKey(fxKeyName)) // 记录中已经有此单例特效
-        {
-            if (_singletonFxRecord[fxKeyName].activeSelf) // 次单例特效激活着，没被回收
-            {
-                _singletonFxRecord[fxKeyName].GameObjectPushPool(); // 回收它
-            }
-
-            _singletonFxRecord.Remove(fxKeyName); // 清楚记录，为之后播新的，加入新的做准备。
-        }
+        StopSingletonFx(fxKeyName);
 
         var fxGo = PlayFx(fxPrefab, position, rotation, autoPoolBack, idPrefix);
         
@@ -71,10 +63,23 @@ public class FxManager : SingletonMono<FxManager>
 
         return fxGo;
     }
-
-    public void StopSingletonFx(GameObject fxPrefab, string idPrefix = "")
+    
+    public GameObject PlaySingletonFx(GameObject fxPrefab, Transform parentTransform, bool autoPoolBack, string idPrefix = "")
     {
+        // 先从所有记录的单例特效中，检测是否有同一个特效
         var fxKeyName = SimplePool.GetKeyName(fxPrefab, idPrefix);
+        StopSingletonFx(fxKeyName);
+
+        var fxGo = PlayFx(fxPrefab, parentTransform, autoPoolBack, idPrefix);
+        
+        // 新播放的特效记录进单例记录中
+        _singletonFxRecord.Add(fxKeyName, fxGo);
+
+        return fxGo;
+    }
+
+    private void StopSingletonFx(string fxKeyName)
+    {
         if (_singletonFxRecord.ContainsKey(fxKeyName)) // 记录中已经有此单例特效
         {
             if (_singletonFxRecord[fxKeyName].activeSelf) // 次单例特效激活着，没被回收
@@ -84,5 +89,11 @@ public class FxManager : SingletonMono<FxManager>
 
             _singletonFxRecord.Remove(fxKeyName); // 清楚记录，为之后播新的，加入新的做准备。
         }
+    }
+
+    public void StopSingletonFx(GameObject fxPrefab, string idPrefix = "")
+    {
+        var fxKeyName = SimplePool.GetKeyName(fxPrefab, idPrefix);
+        StopSingletonFx(fxKeyName);
     }
 }
