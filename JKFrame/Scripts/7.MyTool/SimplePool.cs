@@ -48,13 +48,12 @@ namespace JKFrame.MyTool
             var go = PoolSystem.GetGameObject(goName);
             if (go == null)
             {
-                go = GameObject.Instantiate(gameObjectPrefab, inPosition, inRotation);
+                go = Object.Instantiate(gameObjectPrefab, inPosition, inRotation);
                 go.name = goName;
             }
             else
             {
-                go.transform.position = inPosition;
-                go.transform.rotation = inRotation;
+                go.transform.SetPositionAndRotation(inPosition, inRotation);
             }
             return go;
         }
@@ -72,12 +71,11 @@ namespace JKFrame.MyTool
             var go = PoolSystem.GetGameObject(goName, inParent);
             if (go == null)
             {
-                go = GameObject.Instantiate(gameObjectPrefab, inParent);
+                go = Object.Instantiate(gameObjectPrefab, inParent);
                 go.name = goName;
             }
 
-            go.transform.localPosition = Vector3.zero;
-            go.transform.localRotation = Quaternion.identity;
+            go.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
 
             return go;
         }
