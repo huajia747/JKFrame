@@ -35,7 +35,7 @@ namespace JKFrame.MyTool
         public GameObject PlayFx(GameObject fxPrefab, Transform parentTransform, bool autoPoolBack,
             string idPrefix = "")
         {
-            if (fxPrefab.IsNull()) return null;
+            if (!fxPrefab) return null;
             
             var fxObj = SimplePool.GetGameObject(fxPrefab, parentTransform, idPrefix);
             InternalPlayFx(fxObj, autoPoolBack);
@@ -46,7 +46,7 @@ namespace JKFrame.MyTool
         public GameObject PlayFx(GameObject fxPrefab, Vector3 position, Quaternion rotation, bool autoPoolBack,
             string idPrefix = "")
         {
-            if (fxPrefab.IsNull()) return null;
+            if (!fxPrefab) return null;
             
             var fxObj = SimplePool.GetGameObject(fxPrefab, position, rotation, idPrefix);
             InternalPlayFx(fxObj, autoPoolBack);
@@ -60,7 +60,7 @@ namespace JKFrame.MyTool
         public GameObject PlaySingletonFx(GameObject fxPrefab, Vector3 position, Quaternion rotation, bool autoPoolBack,
             string idPrefix = "")
         {
-            if (fxPrefab.IsNull()) return null;
+            if (!fxPrefab) return null;
             
             // 先从所有记录的单例特效中，检测是否有同一个特效
             var fxKeyName = SimplePool.GetKeyName(fxPrefab, idPrefix);
@@ -77,7 +77,7 @@ namespace JKFrame.MyTool
         public GameObject PlaySingletonFx(GameObject fxPrefab, Transform parentTransform, bool autoPoolBack,
             string idPrefix = "")
         {
-            if (fxPrefab.IsNull()) return null;
+            if (!fxPrefab) return null;
             
             // 先从所有记录的单例特效中，检测是否有同一个特效
             var fxKeyName = SimplePool.GetKeyName(fxPrefab, idPrefix);
@@ -106,7 +106,7 @@ namespace JKFrame.MyTool
 
         public void StopSingletonFx(GameObject fxPrefab, string idPrefix = "")
         {
-            if (fxPrefab.IsNull()) return;
+            if (!fxPrefab) return;
             
             var fxKeyName = SimplePool.GetKeyName(fxPrefab, idPrefix);
             StopSingletonFx(fxKeyName);

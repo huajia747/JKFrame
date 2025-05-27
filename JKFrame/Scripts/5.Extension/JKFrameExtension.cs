@@ -57,12 +57,29 @@ namespace JKFrame
 
         }
 
+        public static void GameObjectPushPool(this GameObject go, float delayTime)
+        {
+            StartCoroutine(go, InternalGameObjectPushPoolDelay(go, delayTime));
+        }
+
+        private static IEnumerator InternalGameObjectPushPoolDelay(GameObject go, float delayTime)
+        {
+            yield return CoroutineTool.WaitForSeconds(delayTime);
+            
+            GameObjectPushPool(go);
+        }
+
         /// <summary>
         /// GameObject放入对象池
         /// </summary>
         public static void GameObjectPushPool(this Component com)
         {
             GameObjectPushPool(com.gameObject);
+        }
+
+        public static void GameObjectPushPool(this Component com, float delayTime)
+        {
+            StartCoroutine(com, InternalGameObjectPushPoolDelay(com.gameObject, delayTime));
         }
 
         /// <summary>
