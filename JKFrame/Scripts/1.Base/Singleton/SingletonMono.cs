@@ -10,7 +10,7 @@ namespace JKFrame
         {
             get
             {
-                if (_instance == null)
+                if (!_instance)
                 {
                     _instance = FindFirstObjectByType<T>();
                     if (FindObjectsByType<T>(FindObjectsSortMode.None).Length > 1)
@@ -19,7 +19,7 @@ namespace JKFrame
                         return _instance;
                     }
 
-                    if (_instance == null)
+                    if (!_instance)
                     {
                         var instanceName = typeof(T).Name;
                         var instanceObj = GameObject.Find(instanceName);
@@ -37,18 +37,18 @@ namespace JKFrame
 
         public static bool IsCreated()
         {
-            return _instance is not null;
+            return _instance;
         }
 
         public static bool NotCreated()
         {
-            return _instance == null;
+            return !_instance;
         }
 
         protected virtual void Awake()
         {
             //在切换场景、加载场景时，当新场景中检测到之前存在同类单例时，把自己销毁
-            if (_instance != null && _instance != this)
+            if (_instance && _instance != this)
             {
                 Destroy(gameObject);
                 return;
