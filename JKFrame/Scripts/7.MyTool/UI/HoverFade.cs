@@ -22,21 +22,22 @@ namespace Plugins.JKFrame.Scripts._7.MyTool.UI
         public float outerAlpha = 0.45f;
         public float speed = 5;
 
-        public GraphicRaycaster graphicRaycaster;
+        // public GraphicRaycaster graphicRaycaster;
 
         private float _curAlpha;
         private bool _isHover;
 
         private void OnEnable()
         {
-            graphicRaycaster = GetComponentInParent<GraphicRaycaster>();
+            // graphicRaycaster = GetComponentInParent<GraphicRaycaster>();
             canvasGroup = GetComponent<CanvasGroup>();
             _curAlpha = canvasGroup.alpha;
             
             //一打开的瞬间就要检测是否鼠标hover在面板上，因为刚生成的面板是没有机会触发pointerEnter或PointerExit的
             List<RaycastResult> results = new List<RaycastResult>();
             var eventData = new PointerEventData(EventSystem.current) {position = Mouse.current.position.ReadValue()};
-            graphicRaycaster.Raycast(eventData, results);
+            // graphicRaycaster.Raycast(eventData, results);
+            EventSystem.current.RaycastAll(eventData, results);
             _isHover = results.Exists(o=> o.gameObject == gameObject);
         }
 
