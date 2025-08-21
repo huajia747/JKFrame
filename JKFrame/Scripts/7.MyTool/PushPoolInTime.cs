@@ -8,6 +8,7 @@ namespace JKFrame.MyTool
         public float lifetime = 1;
 
         private float _timer;
+        private bool _pauseTimer;
 
         private void Start()
         {
@@ -25,17 +26,30 @@ namespace JKFrame.MyTool
 
         private void OnEnable()
         {
+            _pauseTimer = false;
             _timer = lifetime;
         }
 
         private void Update()
         {
+            if (_pauseTimer) return;
+            
             _timer -= Time.deltaTime;
 
             if (_timer <= 0)
             {
                 gameObject.GameObjectPushPool();
             }
+        }
+
+        public void TimePause()
+        {
+            _pauseTimer = true;
+        }
+
+        public void TimeGoes()
+        {
+            _pauseTimer = false;
         }
     }
 }
