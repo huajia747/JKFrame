@@ -3,6 +3,7 @@ using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using System;
 using System.Reflection;
+using UnityEditor.Build;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -150,11 +151,12 @@ namespace JKFrame
         /// </summary>
         public static void AddScriptCompilationSymbol(string name)
         {
-            BuildTargetGroup buildTargetGroup = UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup;
-            string group = UnityEditor.PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
+            BuildTargetGroup buildTargetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
+            var namedBuildTarget = NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup);
+            string group = PlayerSettings.GetScriptingDefineSymbols(namedBuildTarget);
             if (!group.Contains(name))
             {
-                UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, group + ";" + name);
+                PlayerSettings.SetScriptingDefineSymbols(namedBuildTarget, group + ";" + name);
             }
         }
 
@@ -163,11 +165,12 @@ namespace JKFrame
         /// </summary>
         public static void RemoveScriptCompilationSymbol(string name)
         {
-            BuildTargetGroup buildTargetGroup = UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup;
-            string group = UnityEditor.PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
+            BuildTargetGroup buildTargetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
+            var namedBuildTarget = NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup);
+            string group = PlayerSettings.GetScriptingDefineSymbols(namedBuildTarget);
             if (group.Contains(name))
             {
-                UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, group.Replace(";" + name, string.Empty));
+                PlayerSettings.SetScriptingDefineSymbols(namedBuildTarget, group.Replace(";" + name, string.Empty));
             }
         }
 
