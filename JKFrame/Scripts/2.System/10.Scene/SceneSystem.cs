@@ -6,6 +6,7 @@ namespace JKFrame
 {
     public static class SceneSystem
     {
+    
         public static void LoadScene(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
         {
             SceneManager.LoadScene(sceneName, mode);
@@ -61,6 +62,11 @@ namespace JKFrame
             }
         }
 
+        private const string LoadingSceneProgressEventName = "LoadingSceneProgress";
+        private const string LoadSceneSucceedEventName = "LoadSceneSucceed";
+        private const float SceneLoadReadyProgress = 0.9f;
+
+
         /// <summary>
         /// 异步加载场景
         /// 您可以选择EventSystem监听"LoadingSceneProgress"、"LoadSceneSucceed"等事件监听场景进度
@@ -71,6 +77,65 @@ namespace JKFrame
         public static void LoadSceneAsync(int sceneBuildIndex, Action<float> callBack = null, LoadSceneMode mode = LoadSceneMode.Single)
         {
             MonoSystem.Start_Coroutine(DoLoadSceneAsync(sceneBuildIndex, callBack, mode));
+        }
+
+        /// <summary>
+        /// 异步加载场景，加载到可激活状态后，等待Shader编译完成再进入场景。
+        /// Shader编译状态仅Unity Editor下可查询，Player中会直接激活场景。
+        /// </summary>
+        /// <param name="sceneName">场景名称</param>
+        /// <param name="callBack">回调函数,注意：每次进度更新都会调用一次,参数为0-1的进度</param>
+        public static void LoadSceneAsyncWaitForShaderCompilation(string sceneName, Action<float> callBack = null, LoadSceneMode mode = LoadSceneMode.Single)
+        {
+            AsyncOperation ao = SceneManager.LoadSceneAsync(sceneName, mode);
+            MonoSystem.Start_Coroutine(DoLoadSceneAsyncWaitForShaderCompilation(ao, callBack));
+        }
+
+        /// <summary>
+        /// 异步加载场景，加载到可激活状态后，等待Shader编译完成再进入场景。
+        /// Shader编译状态仅Unity Editor下可查询，Player中会直接激活场景。
+        /// </summary>
+        /// <param name="sceneBuildIndex">场景Index</param>
+        /// <param name="callBack">回调函数</param>
+        public static void LoadSceneAsyncWaitForShaderCompilation(int sceneBuildIndex, Action<float> callBack = null, LoadSceneMode mode = LoadSceneMode.Single)
+        {
+            AsyncOperation ao = SceneManager.LoadSceneAsync(sceneBuildIndex, mode);
+            MonoSystem.Start_Coroutine(DoLoadSceneAsyncWaitForShaderCompilation(ao, callBack));
+        }
+
+        private static IEnumerator DoLoadSceneAsyncWaitForShaderCompilation(AsyncOperation ao, Action<float> callBack = null)
+        {
+            if (ao == null) yield break;
+
+            ao.allowSceneActivation = false;
+            float progress = -1;
+
+            while (ao.progress < SceneLoadReadyProgress)
+            {
+                TriggerLoadingProgress(ao.progress, ref progress, callBack);
+                yield return CoroutineTool.WaitForFrames();
+            }
+
+            TriggerLoadingProgress(SceneLoadReadyProgress, ref progress, callBack);
+            yield return CoroutineTool.WaitForShaderCompilation();
+
+            ao.allowSceneActivation = true;
+            while (!ao.isDone)
+            {
+                yield return CoroutineTool.WaitForFrames();
+            }
+
+            TriggerLoadingProgress(1, ref progress, callBack);
+            EventSystem.EventTrigger(LoadSceneSucceedEventName);
+        }
+
+        private static void TriggerLoadingProgress(float progress, ref float lastProgress, Action<float> callBack)
+        {
+            if (Mathf.Approximately(progress, lastProgress)) return;
+
+            lastProgress = progress;
+            callBack?.Invoke(progress);
+            EventSystem.EventTrigger(LoadingSceneProgressEventName, progress);
         }
 
         private static IEnumerator DoLoadSceneAsync(int sceneBuildIndex, Action<float> callBack = null, LoadSceneMode mode = LoadSceneMode.Single)

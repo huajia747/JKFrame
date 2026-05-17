@@ -109,7 +109,7 @@ namespace JKFrame
         /// <summary>
         /// 添加13个参数事件
         /// </summary>
-        public static void AddEventListener<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(string eventName, Action<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T2> action)
+        public static void AddEventListener<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(string eventName, Action<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> action)
         {
             eventModule.AddEventListener(eventName, action);
         }
