@@ -58,5 +58,33 @@ namespace JKFrame
                 yield return new WaitForFrameStruct();
             }
         }
+
+        /// <summary>
+        /// 是否正在编译Shader。
+        /// 仅Unity Editor下可查询，Player中始终返回false。
+        /// </summary>
+        public static bool IsShaderCompiling
+        {
+            get
+            {
+#if UNITY_EDITOR
+                return UnityEditor.ShaderUtil.anythingCompiling;
+#else
+                return false;
+#endif
+            }
+        }
+
+        /// <summary>
+        /// 等待Unity Editor异步Shader编译完成。
+        /// Player中无法查询Editor的Shader编译状态，会直接结束。
+        /// </summary>
+        public static IEnumerator WaitForShaderCompilation()
+        {
+            while (IsShaderCompiling)
+            {
+                yield return new WaitForFrameStruct();
+            }
+        }
     }
 }
