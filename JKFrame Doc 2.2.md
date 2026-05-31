@@ -2200,6 +2200,9 @@ SceneSystem.LoadScene("SampleScene",LoadSceneMode.Single);
 SceneSystem.LoadSceneAsync(sceneName, callBack, mode);
 //(int sceneBuildIndex, Action<float> callBack = null, LoadSceneMode mode = LoadSceneMode.Single)
 SceneSystem.LoadSceneAsync(sceneBuildIndex, callBack, mode);
+//异步加载场景，加载到可激活状态后等待Shader编译完成再进入场景
+SceneSystem.LoadSceneAsyncWaitForShaderCompilation(sceneName, callBack, mode);
+SceneSystem.LoadSceneAsyncWaitForShaderCompilation(sceneBuildIndex, callBack, mode);
 
 //简单实例 异步加载场景SampleScene并实时输出加载进度，在加载完成时输出Success
 //方式1 监听事件获取加载进度
@@ -2227,6 +2230,7 @@ void LoadSceneSucceed()
 * sceneBuildIndex对应BuildSetting中的场景索引号。
 * mode是场景的加载模式，默认为Single表示加载新场景会销毁当前场景，Additive则保留当前场景，将新场景加入到当前场景中。
 * callBack是float参数无返回值回调事件，用于获取加载进度。
+* LoadSceneAsyncWaitForShaderCompilation会先将异步场景加载停在激活前，等待CoroutineTool.WaitForShaderCompilation结束后再进入场景。Shader编译状态仅Unity Editor下可查询，Player中会直接激活场景。
 
 # Mono代理系统
 
@@ -2295,11 +2299,20 @@ CoroutineTool.WaitForSecondsRealtime(time);
 //(int count=1)
 CoroutineTool.WaitForFrames(count);
 CoroutineTool.WaitForFrame();
+//是否正在编译Shader，仅Unity Editor下可查询
+bool isShaderCompiling = CoroutineTool.IsShaderCompiling;
+//等待Shader编译完成，Player中会直接结束
+CoroutineTool.WaitForShaderCompilation();
 
 //使用示例
 private static IEnumerator DoLoadSceneAsync(...)
 {
 	yield return CoroutineTool.WaitForFrame();
+}
+private static IEnumerator DoLoadSceneAfterShaderCompilation(...)
+{
+	yield return CoroutineTool.WaitForShaderCompilation();
+	SceneSystem.LoadScene("SampleScene");
 }
 ```
 
