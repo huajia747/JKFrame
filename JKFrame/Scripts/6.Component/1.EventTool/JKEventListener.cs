@@ -56,7 +56,7 @@ namespace JKFrame
         private interface IJKEventListenerEventInfo<T>
         {
             void TriggerEvent(T eventData);
-            void Destory();
+            void Destroy();
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace JKFrame
                 this.action = action;
                 this.arg = args;
             }
-            public void Destory()
+            public void Destroy()
             {
                 this.action = null;
                 this.arg = default(TEventArg);
@@ -98,7 +98,7 @@ namespace JKFrame
             {
                 this.action = action;
             }
-            public void Destory()
+            public void Destroy()
             {
                 this.action = null;
                 poolModul.PushObject(this);
@@ -171,7 +171,7 @@ namespace JKFrame
                     if (eventInfo.action.Equals(action))
                     {
                         // 移除
-                        eventInfo.Destory();
+                        eventInfo.Destroy();
                         eventList.RemoveAt(i);
                         return;
                     }
@@ -193,7 +193,7 @@ namespace JKFrame
                     if (eventInfo.action.Equals(action))
                     {
                         // 移除
-                        eventInfo.Destory();
+                        eventInfo.Destroy();
                         eventList.RemoveAt(i);
                         return;
                     }
@@ -207,7 +207,7 @@ namespace JKFrame
             {
                 for (int i = 0; i < eventList.Count; i++)
                 {
-                    eventList[i].Destory();
+                    eventList[i].Destroy();
                 }
                 eventList.Clear();
                 poolModul.PushObject(this);

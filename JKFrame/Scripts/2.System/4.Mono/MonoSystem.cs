@@ -173,5 +173,13 @@ namespace JKFrame
             instance.StopAllCoroutines();
         }
         #endregion
+
+        private void OnDestroy()
+        {
+            updateEvent = null;
+            lateUpdateEvent = null;
+            fixedUpdateEvent = null;
+            coroutineDic.Clear();
+        }
     }
 }

@@ -181,7 +181,10 @@ namespace JKFrame
             var enumerator = UIWindowDataDic.GetEnumerator();
             while (enumerator.MoveNext())
             {
-                Destroy(enumerator.Current.Value.instance.gameObject);
+                if (enumerator.Current.Value.instance != null)
+                {
+                    Destroy(enumerator.Current.Value.instance.gameObject);
+                }
             }
             UIWindowDataDic.Clear();
         }
@@ -313,6 +316,8 @@ namespace JKFrame
                 windowData.instance.transform.SetParent(UILayers[layerNum].root);
                 windowData.instance.transform.SetAsLastSibling();
                 windowData.instance.ShowGeneralLogic(layerNum);
+                windowData.layerNum = layerNum;
+                UILayers[layerNum].OnWindowShow();
                 callback?.Invoke(windowData.instance);
             }
             else
@@ -323,12 +328,12 @@ namespace JKFrame
                         windowData.instance = window;
                         window.Init();
                         window.ShowGeneralLogic(layerNum);
-                        callback?.Invoke(window);
+                        windowData.layerNum = layerNum;
+                        UILayers[layerNum].OnWindowShow();
+                        callback?.Invoke(windowData.instance);
                     }
                     , UILayers[layerNum].root, windowKey);
             }
-            windowData.layerNum = layerNum;
-            UILayers[layerNum].OnWindowShow();
         }
         #endregion
 
@@ -426,7 +431,7 @@ namespace JKFrame
         /// <typeparam name="Type">窗口类型</typeparam>
         public static void DestroyWindow(Type type)
         {
-            DestroyWindow(type.Name);
+            DestroyWindow(type.FullName);
         }
 
         /// <summary>
@@ -483,23 +488,23 @@ namespace JKFrame
         /// 尝试关闭窗口
         /// </summary>
         /// <typeparam name="T">窗口类型</typeparam>
-        public static void TryColose<T>(bool destroy = false)
+        public static void TryClose<T>(bool destroy = false)
         {
-            TryColose(typeof(T), destroy);
+            TryClose(typeof(T), destroy);
         }
 
         /// <summary>
         /// 尝试关闭窗口
         /// </summary>
         /// <typeparam name="Type">窗口类型</typeparam>
-        public static void TryColose(Type type, bool destroy = false)
+        public static void TryClose(Type type, bool destroy = false)
         {
-            TryColose(type.FullName, destroy);
+            TryClose(type.FullName, destroy);
         }
         /// <summary>
         /// 尝试关闭窗口
         /// </summary>
-        public static bool TryColose(string windowKey, bool destroy = false)
+        public static bool TryClose(string windowKey, bool destroy = false)
         {
             if (TryGetUIWindowData(windowKey, out UIWindowData windowData))
             {

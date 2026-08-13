@@ -86,7 +86,7 @@ namespace JKFrame
         /// 销毁层数据
         /// </summary>
         /// <param name="pushThisToPool">将对象池层级挂接点也推送进对象池</param>
-        public void Desotry(bool pushThisToPool = false)
+        public void Destroy(bool pushThisToPool = false)
         {
             maxCapacity = -1;
             if (!pushThisToPool)

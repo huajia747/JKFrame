@@ -22,6 +22,10 @@ public abstract class LocalizationConfigBase<LanguageType> : LocalizationConfigS
         {
             dic.TryGetValue(languageType, out content);
         }
+        if (content == null)
+        {
+            Debug.LogError("LocalizationConfig未找到:" + key);
+        }
         return (T)content;
     }
 }

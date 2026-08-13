@@ -2,7 +2,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using static JKFrame.GameObjectPoolModule;
-using Unity.Collections;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -315,7 +314,10 @@ namespace JKFrame
             {
                 GameObjectPoolModule.ClearAll();
 #if UNITY_EDITOR
-                JKFrameRoot.EditorEventModule.EventTrigger("OnClearAllGameObject");
+                if (JKFrameRoot.EditorEventModule != null)
+                {
+                    JKFrameRoot.EditorEventModule.EventTrigger("OnClearAllGameObject");
+                }
 #endif
             }
             if (clearCSharpObject)

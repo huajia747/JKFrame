@@ -163,7 +163,7 @@ namespace JKFrame
             var enumerator = poolDic.GetEnumerator();
             while (enumerator.MoveNext())
             {
-                enumerator.Current.Value.Desotry(false);
+                enumerator.Current.Value.Destroy(false);
             }
             poolDic.Clear();
         }
@@ -180,7 +180,7 @@ namespace JKFrame
         {
             if (poolDic.TryGetValue(keyName, out ObjectPoolData objectPoolData))
             {
-                objectPoolData.Desotry(true);
+                objectPoolData.Destroy(true);
                 poolDic.Remove(keyName);
             }
         }

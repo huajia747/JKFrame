@@ -67,7 +67,7 @@ namespace JKFrame
             [InfoBox("如果填写，则会导致每次保存都是覆盖式的；如果不填写，则每次自动保存为时间命名的文件")]
             public string customSaveFileName = string.Empty;
 #if UNITY_EDITOR
-            public void InitOnEidtor()
+            public void InitOnEditor()
             {
                 EnableLogValueChaged();
             }
@@ -104,7 +104,7 @@ namespace JKFrame
         public void Reset()
         {
             LogConfig = new LogSetting();
-            LogConfig.InitOnEidtor();
+            LogConfig.InitOnEditor();
             SetResourcesSystemType();
             SetSaveSystemType();
             InitUIWindowDataDicOnEditor();
@@ -112,7 +112,7 @@ namespace JKFrame
 
         public void InitOnEditor()
         {
-            if (LogConfig != null) LogConfig.InitOnEidtor();
+            if (LogConfig != null) LogConfig.InitOnEditor();
             SetResourcesSystemType();
             InitUIWindowDataDicOnEditor();
         }
@@ -152,9 +152,11 @@ namespace JKFrame
         {
             BuildTargetGroup buildTargetGroup = UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup;
             string group = UnityEditor.PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
-            if (!group.Contains(name))
+            var symbols = string.IsNullOrEmpty(group) ? new List<string>() : new List<string>(group.Split(';'));
+            if (!symbols.Contains(name))
             {
-                UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, group + ";" + name);
+                symbols.Add(name);
+                UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, string.Join(";", symbols));
             }
         }
 
@@ -165,9 +167,11 @@ namespace JKFrame
         {
             BuildTargetGroup buildTargetGroup = UnityEditor.EditorUserBuildSettings.selectedBuildTargetGroup;
             string group = UnityEditor.PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
-            if (group.Contains(name))
+            if (string.IsNullOrEmpty(group)) return;
+            var symbols = new List<string>(group.Split(';'));
+            if (symbols.RemoveAll(s => s == name) > 0)
             {
-                UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, group.Replace(";" + name, string.Empty));
+                UnityEditor.PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, string.Join(";", symbols));
             }
         }
 

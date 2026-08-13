@@ -239,7 +239,8 @@ namespace JKFrame {
                 return;
             }
             // 不通过缓存池
-            MonoSystem.Start_Coroutine(DoInstantiateGameObjectAsync(assetPath, callBack, parent));
+            string nameForPool = keyName ?? assetName;
+            MonoSystem.Start_Coroutine(DoInstantiateGameObjectAsync(assetPath, callBack, parent, nameForPool));
         }
 
 
@@ -261,25 +262,34 @@ namespace JKFrame {
                 return;
             }
             // 不通过缓存池
-            MonoSystem.Start_Coroutine(DoInstantiateGameObjectAsync<T>(assetPath, callBack, parent));
+            string nameForPool = keyName ?? assetName;
+            MonoSystem.Start_Coroutine(DoInstantiateGameObjectAsync<T>(assetPath, callBack, parent, nameForPool));
         }
 
-        static IEnumerator DoInstantiateGameObjectAsync(string assetPath, Action<GameObject> callBack = null, Transform parent = null) {
+        static IEnumerator DoInstantiateGameObjectAsync(string assetPath, Action<GameObject> callBack, Transform parent, string nameForPool) {
             ResourceRequest resourceRequest = Resources.LoadAsync<GameObject>(assetPath);
             yield return resourceRequest;
             GameObject prefab = resourceRequest.asset as GameObject;
-            GameObject go = GameObject.Instantiate<GameObject>(prefab);
-            go.name = prefab.name;
-            //UnloadAsset(prefab);
+            if (prefab == null) {
+                JKLog.Error($"JKFrame:无法加载资源 {assetPath}");
+                callBack?.Invoke(null);
+                yield break;
+            }
+            GameObject go = GameObject.Instantiate<GameObject>(prefab, parent);
+            go.name = nameForPool;
             callBack?.Invoke(go);
         }
-        static IEnumerator DoInstantiateGameObjectAsync<T>(string assetPath, Action<T> callBack = null, Transform parent = null) where T : UnityEngine.Object {
+        static IEnumerator DoInstantiateGameObjectAsync<T>(string assetPath, Action<T> callBack, Transform parent, string nameForPool) where T : UnityEngine.Object {
             ResourceRequest resourceRequest = Resources.LoadAsync<GameObject>(assetPath);
             yield return resourceRequest;
             GameObject prefab = resourceRequest.asset as GameObject;
-            GameObject go = GameObject.Instantiate<GameObject>(prefab);
-            go.name = prefab.name;
-            //UnloadAsset(prefab);
+            if (prefab == null) {
+                JKLog.Error($"JKFrame:无法加载资源 {assetPath}");
+                callBack?.Invoke(null);
+                yield break;
+            }
+            GameObject go = GameObject.Instantiate<GameObject>(prefab, parent);
+            go.name = nameForPool;
             callBack?.Invoke(go.GetComponent<T>());
         }
         #endregion

@@ -200,7 +200,7 @@ namespace JKFrame
         {
             if (poolDic.TryGetValue(keyName, out GameObjectPoolData gameObjectPoolData))
             {
-                gameObjectPoolData.Desotry(true);
+                gameObjectPoolData.Destroy(true);
                 poolDic.Remove(keyName);
             }
         }
@@ -209,7 +209,7 @@ namespace JKFrame
             var enumerator = poolDic.GetEnumerator();
             while (enumerator.MoveNext())
             {
-                enumerator.Current.Value.Desotry(false);
+                enumerator.Current.Value.Destroy(false);
             }
             poolDic.Clear();
         }

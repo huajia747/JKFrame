@@ -10,7 +10,7 @@ namespace JKFrame
         private Dictionary<string, IEventInfo> eventInfoDic = new Dictionary<string, IEventInfo>();
         #region 内部接口、内部类
 
-        private interface IEventInfo { void Destory(); }
+        private interface IEventInfo { void Destroy(); }
 
         /// <summary>
         /// 无参-事件信息
@@ -19,7 +19,7 @@ namespace JKFrame
         {
             public Action action;
             public void Init(Action action) { this.action = action; }
-            public void Destory()
+            public void Destroy()
             {
                 action = null;
                 objectPoolModule.PushObject(this);
@@ -33,7 +33,7 @@ namespace JKFrame
         {
             public TAction action;
             public void Init(TAction action) { this.action = action; }
-            public void Destory()
+            public void Destroy()
             {
                 action = null;
                 objectPoolModule.PushObject(this);
@@ -249,7 +249,7 @@ namespace JKFrame
         {
             if (eventInfoDic.Remove(eventName, out IEventInfo eventInfo))
             {
-                eventInfo.Destory();
+                eventInfo.Destroy();
             }
         }
 
@@ -260,7 +260,7 @@ namespace JKFrame
         {
             foreach (string eventName in eventInfoDic.Keys)
             {
-                eventInfoDic[eventName].Destory();
+                eventInfoDic[eventName].Destroy();
             }
             eventInfoDic.Clear();
         }
