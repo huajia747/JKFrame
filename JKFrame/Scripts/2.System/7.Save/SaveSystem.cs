@@ -471,7 +471,10 @@ namespace JKFrame
             string dirPath = GetSavePath(saveID);
             string savePath = dirPath + "/" + saveFileName;
             //删除对应的文件
-            File.Delete(savePath);
+            if (File.Exists(savePath))
+            {
+                File.Delete(savePath);
+            }
 
         }
 
@@ -656,10 +659,12 @@ namespace JKFrame
                         {
                             return null;
                         }
-                        FileStream file = new FileStream(path, FileMode.Open);
-                        byte[] bytes = new byte[file.Length];
-                        file.Read(bytes, 0, bytes.Length);
-                        file.Close();
+                        byte[] bytes;
+                        using (FileStream file = new FileStream(path, FileMode.Open))
+                        {
+                            bytes = new byte[file.Length];
+                            file.Read(bytes, 0, bytes.Length);
+                        }
                         return binarySerializer.Deserialize<T>(bytes);
                     }
                 case SaveSystemType.Json:

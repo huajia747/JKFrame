@@ -352,25 +352,25 @@ namespace JKFrame
                 audioSource.transform.SetParent(component.transform);
                 audioSource.transform.localPosition = Vector3.zero;
                 // 宿主销毁时，释放父物体
-                component.OnDestroy(OnOwerDestory, audioSource);
+                component.OnDestroy(OnOwnerDestroy, audioSource);
             }
             // 播放一次音效
             audioSource.PlayOneShot(clip, volumeScale);
             // 播放器回收以及回调函数
-            callBack += () => PlayOverRemoveOwnerDesotryAction(component);         // 播放结束时移除宿主销毁Action
+            callBack += () => PlayOverRemoveOwnerDestroyAction(component);         // 播放结束时移除宿主销毁Action
             RecycleAudioPlay(audioSource, clip, autoReleaseClip, callBack);
         }
 
         // 宿主销毁时，提前回收
-        private void OnOwerDestory(GameObject go, AudioSource audioSource)
+        private void OnOwnerDestroy(GameObject go, AudioSource audioSource)
         {
             audioSource.transform.SetParent(audioPlayRoot);
         }
 
         // 播放结束时移除宿主销毁Action
-        private void PlayOverRemoveOwnerDesotryAction(Component owner)
+        private void PlayOverRemoveOwnerDestroyAction(Component owner)
         {
-            if (owner != null) owner.RemoveOnDestroy<AudioSource>(OnOwerDestory);
+            if (owner != null) owner.RemoveOnDestroy<AudioSource>(OnOwnerDestroy);
         }
 
         public void PlayOneShot(AudioClip clip, Vector3 position, bool autoReleaseClip = false, float volumeScale = 1, bool is3d = true, Action callBack = null)

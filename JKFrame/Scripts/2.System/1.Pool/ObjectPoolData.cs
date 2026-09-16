@@ -44,7 +44,7 @@ namespace JKFrame
             return PoolQueue.Dequeue();
         }
 
-        public void Desotry(bool pushThisToPool = false)
+        public void Destroy(bool pushThisToPool = false)
         {
             PoolQueue.Clear();
             maxCapacity = -1;
